@@ -3,22 +3,30 @@ import { MEALS } from "../data/dummy-data";
 import MealDetails from "../components/MealDetails";
 import Subtitle from "../components/MealDetail/Subtitle";
 import List from "../components/MealDetail/List";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useContext } from "react";
 import IconButton from "../components/IconButton";
+import { FavoritesContext } from "../store/context/favorites-context";
+
 
 const MealsDetailScreen = ({route, navigation}) =>{
+    const favoriteMealsCtx = useContext(FavoritesContext);
+
     const mealID = route.params.mealId;
     const meal = MEALS.find((m) => m.id === mealID);
-    const [isPressed, setIsPressed] = useState(false);
+    const mealIsFavorite = favoriteMealsCtx.ids.includes(mealID);
+
     const headerButtonPressHandler = () =>{
-        setIsPressed(!isPressed);
+         if(mealIsFavorite) favoriteMealsCtx.removeFavorite(mealID);
+         else favoriteMealsCtx.addFavorite(mealID);
     }
 
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () =>{
                 return (
-                    <IconButton  icon="star" onPress={headerButtonPressHandler} color={isPressed ? 'red' : 'white'}/>
+                    <IconButton  icon="star" 
+                    onPress={headerButtonPressHandler} 
+                    color={mealIsFavorite ? 'red' : 'white'}/>
                 )
             }
         });
